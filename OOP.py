@@ -6,19 +6,40 @@ class Mentor:
 
 
 class Lecturer(Mentor):
-    grades = {}
 
+    def __init__(self, name, surname):
+        super().__init__(name, surname)
+        self.grades = dict()
+
+    def average_grade_lectures(self):
+        av_sum_of_grades = 0
+        for g in self.grades.values():
+            if len(g) > 0:
+                av_sum_of_grades += sum(g) / len(g)
+            else:
+                continue
+
+        if len(self.grades) >0:
+            return av_sum_of_grades / len(self.grades)
+        else:
+            return 'Лектор ещё не был оценён студентами'
+
+    def __str__(self):
+        return f'Имя: {self.name}\nФамилия: {self.surname}\nСредняя оценка за лекции: {self.average_grade_lectures()}'
 
 class Rewiewer(Mentor):
+
+    def __str__(self):
+        return f'Имя: {self.name}\nФамилия: {self.surname}'
+
     def rate_hw(self, student, course, grade):
         if isinstance(student, Student) and course in self.courses_attached and course in student.courses_in_progress:
             student.grades.setdefault(course, [])
             student.grades[course].append(grade)
             return None
         else:
-            print(f'Студент {student.surname} не обучается на курсе {course} '
-                  f'или эксперт {self.surname} не курирует данный курс!')
-            return None
+            return f'Студент {student.surname} не обучается на курсе {course} или эксперт {self.surname} не курирует данный курс!'
+
 
 
 class Student:
@@ -30,63 +51,75 @@ class Student:
         self.courses_in_progress = []
         self.grades = {}
 
+    def __str__(self):
+        return (f'Студент:\nИмя: {self.name}\nФамилия: {self.surname}\n'
+                f'Средняя оценка за домашнее задание: {self.aver_rate_hw()}\n'
+                f'Курсы в процессе изучения: {self.courses_in_progress}\n'
+                f'Завершённые курсы: {self.finished_courses}')
+
     def rate_lecturer(self, lecturer, course, grade):
         if course not in self.finished_courses:
-            print(f'Студент {self.surname} не может оценить курс {course}, потому что не окончил данный курс!')
-            return None
+            return f'Студент {self.surname} не может оценить курс {course}, потому что не окончил данный курс!'
         if isinstance(lecturer, Lecturer) and course in lecturer.courses_attached:
             lecturer.grades.setdefault(course, [])
             lecturer.grades[course].append(grade)
+            return None
         else:
-            print(f'Лектор {lecturer.surname} не ведёт курс {course}!')
-        return None
+            return f'Лектор {lecturer.surname} не ведёт курс {course}!'
+
+    def aver_rate_hw(self):
+        av_rate = 0
+        for v in self.grades.values():
+            if len(v) > 0:
+                av_rate += sum(v) / len(v)
+            else:
+                continue
+        return av_rate / len(self.grades)
 
 
-# Список лекторов и что преподают
-lecturer1 = Lecturer('Александр', 'Александров')
-lecturer1.courses_attached = ['Python', 'PHP']
 
-lecturer2 = Lecturer('Борис', 'Борисов')
-lecturer2.courses_attached = ['JS', 'HTML']
-
-# Создание ревьюеров
+# Создаём ревьюеров
 rewiewer1 = Rewiewer('Владимир', 'Володин')
-rewiewer1.courses_attached = ['Python', 'PHP', 'JS', 'HTML']
+rewiewer1.courses_attached = ['Python', 'PHP', 'Django']
+rewiewer2 = Rewiewer('Геннадий', 'Геннадин')
+rewiewer2.courses_attached = ['HTML', 'CSS', 'JS']
 
-# Проверка получившегося
-print(f'Лектор {lecturer1.name} {lecturer1.surname} ведёт следующие курсы: {lecturer1.courses_attached}.')
-print(f'Лектор {lecturer2.name} {lecturer2.surname} ведёт следующие курсы: {lecturer2.courses_attached}.')
-print()
+# print('Ревьюер:\n', rewiewer1, sep='')
+# print('Ревьюер:\n', rewiewer2, sep='')
 
-# Список студентов и что изучают
-student1 = Student('Иван', 'Иванов', 'м')
-student1.finished_courses = ["Python", 'JS', 'HTML']
-student1.courses_in_progress = ['JS']
+# Создаем лекторов
+lecturer1 = Lecturer('Александр', 'Александров')
+lecturer1.courses_attached = ['Python', 'PHP', 'Django']
+lecturer2 = Lecturer('Борис', 'Борисов')
+lecturer2.courses_attached = ['HTML', 'CSS', 'JS', 'PHP']
 
-student2 = Student('Пётр', 'Петров', 'м')
-student2.finished_courses = ["Python", 'С++', 'PHP']
-student2.courses_in_progress = ['HTML']
+# print('Лектор:\n', lecturer1, sep='')
+# print('Лектор:\n', lecterur2, sep='')
 
-# Проверка получившегося
-print(f'Студент {student1.surname} {student1.name} закончил следующие курсы: {student1.finished_courses}.')
-print(f'Студент {student2.surname} {student2.name} закончил следующие курсы: {student2.finished_courses}.')
-print()
+# Создаем студентов
+student1 = Student('Олег', 'Олегов', 'м')
+student1.courses_in_progress = ['Python', 'PHP', 'JS']
+student1.finished_courses = ['HTML', 'Django']
+student2 = Student('Елена', 'Еленова', 'ж')
+student2.courses_in_progress = ['HTML', 'CSS', 'JS']
+student2.finished_courses = ['Python', 'PHP']
 
-# Оценки лекторов студентами
-student1.rate_lecturer(lecturer1, 'Python', 5)
-student2.rate_lecturer(lecturer2, 'HTML', 3)
-student1.rate_lecturer(lecturer1, 'JS', 4)
-student2.rate_lecturer(lecturer1, 'Python', 4)
+# Ревьюеры выставляют оценки студентам
+rewiewer1.rate_hw(student1, 'Python', 4)
+rewiewer2.rate_hw(student1, 'JS', 5)
+rewiewer2.rate_hw(student2, 'HTML', 6)
+rewiewer2.rate_hw(student2, 'CSS', 9)
 
-# Проверка получившегося
-print(
-    f'Лектор {lecturer1.name} {lecturer1.surname} получил следующую оценку своих усилий от студентов: {lecturer1.grades}.')
-print()
+print(student1)
+print(student2)
 
-# Оценка студентов ревьюерами
-rewiewer1.rate_hw(student1, 'JS', 3)
-rewiewer1.rate_hw(student2, 'HTML', 4)
+# Студенты оценивают лекторов
+student1.rate_lecturer(lecturer1, 'Django', 9)
+student1.rate_lecturer(lecturer2, 'HTML', 10)
 
-# Проверка получившегося
-print(f'Студент {student1.surname} имеет следующие оценки {student1.grades}.')
-print(f'Студент {student2.surname} имеет следующие оценки {student2.grades}.')
+student2.rate_lecturer(lecturer1, 'Python', 7)
+student2.rate_lecturer(lecturer2, 'PHP', 7)
+
+# Средние оценки лекторов за лекции
+print(f'Средний бал за лекции, выставленный лектору {lecturer1.surname}: {lecturer1.average_grade_lectures()}')
+print(f'Средний бал за лекции, выставленный лектору {lecturer2.surname}: {lecturer2.average_grade_lectures()}')
