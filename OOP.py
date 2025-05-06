@@ -34,10 +34,10 @@ class Lecturer(Mentor):
         if len(self.grades) > 0:
             return av_sum_of_grades / len(self.grades)
         else:
-            return 'Лектор ещё не был оценён студентами'
+            return 0.0
 
 
-class Rewiewer(Mentor):
+class Reviewer(Mentor):
 
     def __str__(self):
         return f'Имя: {self.name}\nФамилия: {self.surname}'
@@ -92,11 +92,14 @@ class Student:
 
     def aver_rate_hw(self):
         av_rate = 0
-        for v in self.grades.values():
-            if len(v) > 0:
-                av_rate += sum(v) / len(v)
-            else:
-                continue
+        if len(self.grades) > 0:
+            for v in self.grades.values():
+                if len(v) > 0:
+                    av_rate += sum(v) / len(v)
+                else:
+                    continue
+        else:
+            return 0.0
         return av_rate / len(self.grades)
 
 
@@ -125,13 +128,13 @@ def aver_grade_for_lecturers_on_course(list_lecturers, course):
 
 
 # Создаём ревьюеров
-rewiewer1 = Rewiewer('Владимир', 'Володин')
-rewiewer1.courses_attached = ['Python', 'PHP', 'Django']
-rewiewer2 = Rewiewer('Геннадий', 'Геннадин')
-rewiewer2.courses_attached = ['HTML', 'CSS', 'JS']
+reviewer1 = Reviewer('Владимир', 'Володин')
+reviewer1iewer1.courses_attached = ['Python', 'PHP', 'Django']
+reviewer2 = Reviewer('Геннадий', 'Геннадин')
+reviewer2.courses_attached = ['HTML', 'CSS', 'JS']
 
-# # print('Ревьюер:\n', rewiewer1, sep='')
-# # print('Ревьюер:\n', rewiewer2, sep='')
+# # print('Ревьюер:\n', reviewer1, sep='')
+# # print('Ревьюер:\n', reviewer2, sep='')
 #
 # Создаем лекторов
 lecturer1 = Lecturer('Александр', 'Александров')
@@ -155,10 +158,10 @@ student2.finished_courses = ['Python', 'PHP']
 list_students = [student1, student2]
 
 # Ревьюеры выставляют оценки студентам
-rewiewer1.rate_hw(student1, 'Python', 7)
-rewiewer2.rate_hw(student1, 'JS', 8)
-rewiewer2.rate_hw(student2, 'HTML', 6)
-rewiewer2.rate_hw(student2, 'CSS', 9)
+reviewer1.rate_hw(student1, 'Python', 7)
+reviewer2.rate_hw(student1, 'JS', 8)
+reviewer2.rate_hw(student2, 'HTML', 6)
+reviewer2.rate_hw(student2, 'CSS', 9)
 
 # print(student1)
 # print(student2)
@@ -183,5 +186,5 @@ student2.rate_lecturer(lecturer2, 'PHP', 7)
 g = aver_grade_for_students_on_course(list_students, 'Python')
 print(f'Средняя оценка студентов на курсе "Python" составляет {g}')
 
-g = aver_grade_for_students_on_course(list_lecturers, 'Python')
+g = aver_grade_for_lecturers_on_course(list_lecturers, 'Python')
 print(f'Средняя оценка лекторов на курсе "Python" составляет {g}')
